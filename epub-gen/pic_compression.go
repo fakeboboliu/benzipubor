@@ -1,0 +1,83 @@
+/*
+ *     benzipubor
+ *     Copyright (C) 2018 bobo liu
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package epub_gen
+
+import (
+	"image"
+	"github.com/nfnt/resize"
+	"image/color"
+	"io"
+	"os"
+	"strings"
+	"image/jpeg"
+	"image/png"
+	"image/gif"
+	"errors"
+)
+
+func (gen *Gen) doZip(path string, w io.Writer) error {
+	f, err := os.Open(path)
+	if err != nil {
+		gen.l.Println("Can not open image file:", path)
+		gen.l.Println("[DEBUG]", err)
+		return err
+	}
+
+	var src image.Image
+	switch strings.ToLower(getMime(path)) {
+	case "image/jpeg":
+		src, err = jpeg.Decode(f)
+	case "image/png":
+		src, err = png.Decode(f)
+	case "image/gif":
+		src, err = gif.Decode(f)
+	default:
+		err = errors.New("extension not known")
+	}
+	if err != nil {
+		gen.l.Println("Image file can't load:", path)
+		gen.l.Println("[DEBUG]", err)
+		return err
+	}
+
+	bound := src.Bounds()
+	dx := bound.Dx()
+	dy := bound.Dy()
+	dst := src
+	if dx > gen.X {
+		dst = resize.Resize(uint(gen.X), uint(dy*(gen.X/dx)), src, resize.Lanczos3)
+	}
+
+	bound = dst.Bounds()
+	grey := image.NewRGBA(bound)
+	dx = bound.Dx()
+	dy = bound.Dy()
+	for i := 0; i < dx; i++ {
+		for j := 0; j < dy; j++ {
+			colorRgb := dst.At(i, j)
+			_, g, _, a := colorRgb.RGBA()
+			g_uint8 := uint8(g >> 8)
+			a_uint8 := uint8(a >> 8)
+			grey.SetRGBA(i, j, color.RGBA{g_uint8, g_uint8, g_uint8, a_uint8})
+		}
+	}
+	jpeg.Encode(w, grey.SubImage(bound), &jpeg.Options{Quality: 80})
+
+	return nil
+}
