@@ -29,7 +29,7 @@ import (
 func NewGen() *Gen {
 	return &Gen{
 		bi: bookInfo{UUID: randUUID(), CreateTime: time.Now().Format(time.RFC3339)},
-		X:  720,
+		X:  720, tocNum: 1,
 	}
 }
 
@@ -44,4 +44,10 @@ func getZipWriter(w *zip.Writer, name string) io.Writer {
 		panic(err)
 	}
 	return a
+}
+
+type toc struct {
+	ID   int
+	Pic  int
+	Name string
 }

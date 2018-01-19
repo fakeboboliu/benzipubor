@@ -27,13 +27,20 @@ import (
 )
 
 type Gen struct {
-	imgList []string
+	imgList  []string
+	tocNodes []toc
+	tocNum   int
 
 	bi bookInfo
 	l  *log.Logger
 
 	X      int
 	noGrey bool
+}
+
+func (g *Gen) AddTocNode(pic int, name string) {
+	g.tocNodes = append(g.tocNodes, toc{Pic: pic, Name: name, ID: g.tocNum})
+	g.tocNum += 1
 }
 
 func (g *Gen) SetImgList(imgList []string) {
@@ -71,17 +78,26 @@ func (g Gen) Do(dst string) {
 	}
 
 	for i, fn := range g.imgList {
+		id := i + 1
 		// Pic
-		pic := getZipWriter(w, "OEBPS/image/i_"+strconv.Itoa(i)+".jpg")
+		pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
 		g.doZip(fn, pic)
 
 		// Pages
-		page := getZipWriter(w, "OEBPS/text/p_"+strconv.Itoa(i)+".xhtml")
-		tpls["page"].Execute(page, i)
+		page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
+		tpls["page"].Execute(page, id)
+
+		// Add ID to parse list
+		g.bi.Objects = append(g.bi.Objects, id)
 	}
 
-	opf := getZipWriter(w, "OEBPS/standard.opf")
-	tpls["opf"].Execute(opf, g)
+	g.bi.TocNodes = g.tocNodes
+
+	opf := getZipWriter(w, "content.opf")
+	tpls["opf"].Execute(opf, g.bi)
+
+	toc := getZipWriter(w, "toc.ncx")
+	tpls["toc"].Execute(toc, g.bi)
 
 	buf.Flush()
 }

@@ -22,9 +22,6 @@ type bookInfo struct {
 	Title      string
 	UUID       string
 	CreateTime string
-	Objects     []obj
-}
-
-type obj struct {
-	Name string
+	Objects    []int
+	TocNodes   []toc
 }

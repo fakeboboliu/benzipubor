@@ -57,27 +57,22 @@ var tplstrs = map[string]string{
 
 <manifest>
 
-<!-- navigation -->
-<item media-type = "application/xhtml+xml" id = "toc" href = "navigation-documents.xhtml" properties = "nav"></item>
-
+<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
 <!-- style -->
 <item media-type = "text/css" id = "fixed-layout-jp" href = "style/fixed-layout-jp.css"></item>
 
-<!-- image -->
 {{range .Objects}}
-<item id="i_{{.Name}}" href="image/i_{{.Name}}.jpg" media-type="image/jpeg"></item>
-{{end}}
-
-<item id = "p-cover" href = "text/p_cover.xhtml" media-type = "application/xhtml+xml" properties = "svg" fallback = "cover"></item>
-{{range .Objects}}
-<item id="p_{{.Name}}" href="text/p_{{.Name}}.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="i_{{.Name}}"></item>
+<item id="i_{{.}}" href="image/i_{{.}}.jpg" media-type="image/jpeg"></item>
+<item id="p_{{.}}" href="text/p_{{.}}.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="i_{{.}}"></item>
 {{end}}
 
 </manifest>
 
-<spine>
+<spine toc="ncx">
 
-<itemref linear = "yes" idref = "p-cover" properties = "rendition:page-spread-center"></itemref>
+{{range .Objects}}
+<itemref idref="p_{{.}}"/>
+{{end}}
 
 </spine>
 
@@ -106,64 +101,40 @@ var tplstrs = map[string]string{
 	</div>
 	</body>
 	</html>`, // page.xhtml need: ID
+	"toc": `<?xml version="1.0"?>
+<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <head>
+    <meta name="dtb:uid" content="unknown"/>
+    <meta name="dtb:depth" content="1"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+  <docTitle>
+    <text>{{.Title}}</text>
+  </docTitle>
+  <navMap>
+  {{range .TocNodes}}
+    <navPoint id="navPoint{{.ID}}" playOrder="{{.ID}}">
+      <navLabel>
+        <text>{{.Name}}</text>
+      </navLabel>
+      <content src="text/p_{{.Pic}}.xhtml" />  
+    </navPoint>
+   {{end}}
+   </navMap>
+</ncx>
+`,
 }
 
 var staticFiles = map[string]string{
-	"OEBPS/navigation-documents.xhtml": `<?xml version = "1.0" encoding = "UTF-8"?>
-<!DOCTYPE html><html xmlns = "http://www.w3.org/1999/xhtml" xmlns:epub = "http://www.idpf.org/2007/ops" xml:lang = "ja">
-<head>
-<meta charset = "UTF-8"></meta>
-<title>Navigation</title>
-</head>
-<body>
-<nav epub:type = "toc" id = "toc">
-<h1>Navigation</h1>
-<ol>
-<li><a href="text/p_cover.xhtml">表紙</a></li>
-</ol>
-</nav>
-<nav epub:type = "landmarks">
-<ol>
-<li><a epub:type = "bodymatter" href = "text/p_cover.xhtml">Start of Content</a></li>
-</ol>
-</nav>
-</body>
-</html>`,
-	"META-INF/container.xml": `<?xml version="1.0"?>
-<container
- version="1.0"
- xmlns="urn:oasis:names:tc:opendocument:xmlns:container"
->
-<rootfiles>
-<rootfile
- full-path="OEBPS/standard.opf"
- media-type="application/oebps-package+xml"
-/>
-</rootfiles>
+	"META-INF/container.xml": `<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
 </container>`,
-	"OEBPS/style/fixed-layout-jp.css": `@charset "UTF-8"; html,body{margin:0;padding:0;font-size:0;}svg{margin:0;padding:0;}`,
-	"OEBPS/text/p_cover.xhtml": `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html
- xmlns="http://www.w3.org/1999/xhtml"
- xmlns:epub="http://www.idpf.org/2007/ops"
- xml:lang="ja"
->
-<head>
-<meta charset="UTF-8" />
-<title>Yens</title>
-<link rel="stylesheet" type="text/css" href="../style/fixed-layout-jp.css"/>
-<meta name="viewport" content="width=1000, height=1500"/>
-</head>
-<body>
-<div class="main">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
- xmlns:xlink="http://www.w3.org/1999/xlink"
- width="100%" height="100%" viewBox="0 0 1000 1500">
-</svg>
-</div>
-</body>
-</html>`,
+	"style/fixed-layout-jp.css": `@charset "UTF-8"; html,body{margin:0;padding:0;font-size:0;}svg{margin:0;padding:0;}`,
+	"mimetype":                  "application/epub+zip",
 }
 
 var tpls = map[string]*template.Template{}
