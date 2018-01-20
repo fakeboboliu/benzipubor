@@ -29,7 +29,7 @@ import (
 func NewGen() *Gen {
 	return &Gen{
 		bi: bookInfo{UUID: randUUID(), CreateTime: time.Now().Format(time.RFC3339)},
-		X:  720, tocNum: 1, imgList: make([]string, 0), tocNodes: make([]toc, 0),
+		X:  720, NoGrey: false, tocNum: 1, imgList: make([]string, 0), tocNodes: make([]toc, 0),
 	}
 }
 
