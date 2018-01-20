@@ -23,10 +23,16 @@ import (
 	. "github.com/popu125/benzipubor/epub-gen"
 	"log"
 	"os"
+	"fmt"
+)
+
+const (
+	MODE_AIO   = iota
+	MODE_SINGLE
 )
 
 var (
-	autoMode string
+	autoMode uint
 	inputDir string
 	logFile  string
 
@@ -35,18 +41,24 @@ var (
 )
 
 func init() {
-	flag.StringVar(&autoMode, "mode", "off", "Auto mode: 'off' to turn off, 'aio' write all to one file, 'single' make a single file for each dictionary")
-	flag.StringVar(&inputDir, "in", ".", "Input dir")
-	flag.StringVar(&logFile, "log", "stdout", "Log file")
+	flag.UintVar(&autoMode, "mode", 0, "模式选择: 0: 'aio' 制作为一个电子书文件, 1: 'single' 每个子目录一个独立文件")
+	flag.StringVar(&inputDir, "in", ".", "输入目录")
+	flag.StringVar(&logFile, "log", "stdout", "日志输出")
 
-	noGrey := flag.Bool("nogrey", false, "Don't make pictures grey")
-	help := flag.Bool("h", false, "Show this message")
+	noGrey := flag.Bool("nogrey", false, "不要将图片处理为灰色")
+	sizex := flag.Int("sizex", 780, "图片压缩尺寸（横向）")
+	help := flag.Bool("h", false, "打印帮助信息")
 	flag.Parse()
 	if *help {
 		flag.Usage()
 		os.Exit(0)
 	}
+	if autoMode >= 2 {
+		fmt.Println("Unknown mode:", autoMode)
+		os.Exit(1)
+	}
 
 	gen = NewGen()
 	gen.SetNoGrey(*noGrey)
+	gen.X = *sizex
 }
