@@ -36,7 +36,7 @@ type Gen struct {
 	l  *log.Logger
 
 	X      int
-	noGrey bool
+	NoGrey bool
 }
 
 func (g *Gen) AddTocNode(pic int, name string) {
@@ -46,10 +46,6 @@ func (g *Gen) AddTocNode(pic int, name string) {
 
 func (g *Gen) SetImgList(imgList []string) {
 	g.imgList = imgList
-}
-
-func (g *Gen) SetNoGrey(noGrey bool) {
-	g.noGrey = noGrey
 }
 
 func (g *Gen) SetTitle(t string) {
