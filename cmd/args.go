@@ -20,14 +20,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	. "github.com/popu125/benzipubor/epub-gen"
 	"log"
 	"os"
-	"fmt"
 )
 
 const (
-	MODE_AIO   = iota
+	MODE_AIO    = iota
 	MODE_SINGLE
 )
 
@@ -59,6 +59,6 @@ func init() {
 	}
 
 	gen = NewGen()
-	gen.SetNoGrey(*noGrey)
+	gen.NoGrey = *noGrey
 	gen.X = *sizex
 }

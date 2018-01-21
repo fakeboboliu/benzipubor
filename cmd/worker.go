@@ -17,28 +17,3 @@
  */
 
 package main
-
-import (
-	"fmt"
-	"log"
-	"os"
-)
-
-func main() {
-	fmt.Println("======== Welcome to benzipubor ========\n")
-
-	switch logFile {
-	case "stdout":
-		l = log.New(os.Stdout, "[MAIN]", log.LstdFlags)
-	case "stderr":
-		l = log.New(os.Stdin, "[MAIN]", log.LstdFlags)
-	default:
-		f, err := os.Open(logFile)
-		if err != nil {
-			fmt.Println("Cannot open file for write:", logFile)
-		}
-		l = log.New(f, "[MAIN]", log.LstdFlags)
-		defer f.Close()
-	}
-
-}

@@ -18,3 +18,12 @@
 
 package main
 
+import (
+	"mime"
+	"path"
+)
+
+func getMime(fn string) string {
+	ext := path.Ext(fn)
+	return mime.TypeByExtension(ext)
+}
