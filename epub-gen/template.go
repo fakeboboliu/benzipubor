@@ -26,7 +26,7 @@ import (
 
 var tplstrs = map[string]string{
 	"opf": `<?xml version = "1.0" encoding = "UTF-8"?>
-<package xmlns = "http://www.idpf.org/2007/opf" version = "3.0" xml:lang = "ja" unique-identifier = "unique-id" prefix = "rendition: http://www.idpf.org/vocab/rendition/#         epub-bundle-tool: https://wing-kai.github.io/epub-manga-creator/         ebpaj: http://www.ebpaj.jp/         fixed-layout-jp: http://www.digital-comic.jp/">
+<package xmlns = "http://www.idpf.org/2007/opf" version = "3.0" xml:lang = "ja" unique-identifier = "unique-id" prefix = "rendition: http://www.idpf.org/vocab/rendition/#">
 
 <metadata xmlns:dc = "http://purl.org/dc/elements/1.1/">
 
