@@ -20,9 +20,12 @@ package main
 
 import (
 	"os"
+	"sort"
 )
 
 func walkDir(path string) ([]string, error) {
+	/// 返回：图片文件路径
+
 	lo := *l
 	lo.SetPrefix("[WALK]")
 
@@ -38,21 +41,24 @@ func walkDir(path string) ([]string, error) {
 		lo.Println(err)
 		return nil, err
 	}
+
 	fileList := make([]string, 0)
 	for _, fd := range fds {
 		if fd.IsDir() {
 			lo.Fatalln("仅支持一层子目录")
 		} else {
-			if fileFilter(path) {
-				lo.Println("New image file:", path)
-				fileList = append(fileList, path)
+			p := pathLink(path, fd.Name())
+			if fileFilter(fd.Name()) {
+				lo.Println("New image file:", p)
+				fileList = append(fileList, p)
 			} else {
-				lo.Println("Unknown file:", path)
+				lo.Println("Unknown file:", p)
 				continue
 			}
 		}
 	}
 
+	sort.Strings(fileList)
 	return fileList, nil
 }
 
@@ -79,13 +85,22 @@ func walkRoot(path string) ([]unit, error) {
 	for _, fd := range fds {
 		if fd.IsDir() {
 			haveDir = true
-			if autoMode == MODE_AIO {
+			switch autoMode {
+			case MODE_AIO:
 				list, err := walkDir(fd.Name())
 				if err != nil {
 					lo.Println("Cannot access:", fd.Name())
 					lo.Fatalln(err)
 				}
 				units = append(units, unit{Name: fd.Name(), ImageList: list})
+			case MODE_SINGLE:
+				list, err := walkDir(fd.Name())
+				if err != nil {
+					lo.Println("Cannot access:", fd.Name())
+					lo.Fatalln(err)
+				}
+				units = []unit{{Name: fd.Name(), ImageList: list},}
+				gen(units)
 			}
 			// todo: MODE_SINGLE
 		} else {
@@ -95,6 +110,7 @@ func walkRoot(path string) ([]unit, error) {
 			}
 		}
 	}
+
 	if !haveDir {
 		fd, _ := f.Stat()
 		list, err := walkDir(path)
@@ -104,6 +120,7 @@ func walkRoot(path string) ([]unit, error) {
 		}
 		units = append(units, unit{Name: fd.Name(), ImageList: list})
 	}
+
 	return units, nil
 }
 
