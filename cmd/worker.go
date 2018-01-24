@@ -24,10 +24,11 @@ import (
 
 func gen(units []unit, dst string) {
 	g := NewGen()
-	g.NoGrey = noGrey
+	g.Grey = grey
 	g.X = sizeX
 	g.SetLogger(*l)
 	g.SetTitle(dst)
+	g.SetQuality(quality)
 
 	for _, u := range units {
 		index := g.AppendImgList(u.ImageList)
