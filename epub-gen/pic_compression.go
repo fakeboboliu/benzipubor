@@ -31,11 +31,11 @@ import (
 	"errors"
 )
 
-func (gen *Gen) doZip(path string, w io.Writer) error {
+func (g *Gen) doZip(path string, w io.Writer) error {
 	f, err := os.Open(path)
 	if err != nil {
-		gen.l.Println("Can not open image file:", path)
-		gen.l.Println("[DEBUG]", err)
+		g.l.Println("Can not open image file:", path)
+		g.l.Println("[DEBUG]", err)
 		return err
 	}
 
@@ -51,8 +51,8 @@ func (gen *Gen) doZip(path string, w io.Writer) error {
 		err = errors.New("extension not known")
 	}
 	if err != nil {
-		gen.l.Println("Image file can't load:", path)
-		gen.l.Println("[DEBUG]", err)
+		g.l.Println("Image file can't load:", path)
+		g.l.Println("[DEBUG]", err)
 		return err
 	}
 
@@ -60,24 +60,27 @@ func (gen *Gen) doZip(path string, w io.Writer) error {
 	dx := bound.Dx()
 	dy := bound.Dy()
 	dst := src
-	if dx > gen.X {
-		dst = resize.Resize(uint(gen.X), uint(dy*(gen.X/dx)), src, resize.Lanczos3)
+	if dx > g.X {
+		dst = resize.Resize(uint(g.X), uint(dy*(g.X/dx)), src, resize.Lanczos3)
 	}
 
-	bound = dst.Bounds()
-	grey := image.NewRGBA(bound)
-	dx = bound.Dx()
-	dy = bound.Dy()
-	for i := 0; i < dx; i++ {
-		for j := 0; j < dy; j++ {
-			colorRgb := dst.At(i, j)
-			_, g, _, a := colorRgb.RGBA()
-			g_uint8 := uint8(g >> 8)
-			a_uint8 := uint8(a >> 8)
-			grey.SetRGBA(i, j, color.RGBA{g_uint8, g_uint8, g_uint8, a_uint8})
+	if g.Grey {
+		bound = dst.Bounds()
+		grey := image.NewRGBA(bound)
+		dx = bound.Dx()
+		dy = bound.Dy()
+		for i := 0; i < dx; i++ {
+			for j := 0; j < dy; j++ {
+				colorRgb := dst.At(i, j)
+				_, green, _, a := colorRgb.RGBA()
+				g_uint8 := uint8(green >> 8)
+				a_uint8 := uint8(a >> 8)
+				grey.SetRGBA(i, j, color.RGBA{g_uint8, g_uint8, g_uint8, a_uint8})
+			}
 		}
+		dst = grey.SubImage(bound)
 	}
-	jpeg.Encode(w, grey.SubImage(bound), &jpeg.Options{Quality: 80})
 
+	jpeg.Encode(w, dst, &jpeg.Options{Quality: g.quality})
 	return nil
 }
