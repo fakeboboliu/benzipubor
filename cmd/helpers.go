@@ -21,9 +21,14 @@ package main
 import (
 	"mime"
 	"path"
+	"os"
 )
 
 func getMime(fn string) string {
 	ext := path.Ext(fn)
 	return mime.TypeByExtension(ext)
+}
+
+func pathLink(a, b string) string {
+	return a + string(os.PathSeparator) + b
 }

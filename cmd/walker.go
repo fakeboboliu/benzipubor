@@ -62,22 +62,20 @@ func walkDir(path string) ([]string, error) {
 	return fileList, nil
 }
 
-func walkRoot(path string) ([]unit, error) {
+func walkRootAndGen(path string) {
 	lo := *l
 	lo.SetPrefix("[WALK]")
 
 	f, err := os.Open(path)
 	if err != nil {
-		lo.Println(err)
-		return nil, err
+		lo.Fatalln(err)
 	}
 	defer f.Close()
 	os.Chdir(path)
 
 	fds, err := f.Readdir(0)
 	if err != nil {
-		lo.Println(err)
-		return nil, err
+		lo.Fatalln(err)
 	}
 
 	units := make([]unit, 0)
@@ -100,28 +98,29 @@ func walkRoot(path string) ([]unit, error) {
 					lo.Fatalln(err)
 				}
 				units = []unit{{Name: fd.Name(), ImageList: list},}
-				gen(units)
+				gen(units, fd.Name())
 			}
-			// todo: MODE_SINGLE
 		} else {
 			if haveDir {
-				lo.Fatalln("存在子目录，根目录下的文件将被忽略:", fd.Name())
+				lo.Println("存在子目录，根目录下的文件将被忽略:", fd.Name())
 				continue
 			}
 		}
 	}
 
 	if !haveDir {
-		fd, _ := f.Stat()
 		list, err := walkDir(path)
 		if err != nil {
-			lo.Println("Cannot access:", fd.Name())
+			lo.Println("Cannot access:", f.Name())
 			lo.Fatalln(err)
 		}
-		units = append(units, unit{Name: fd.Name(), ImageList: list})
+		units = append(units, unit{Name: f.Name(), ImageList: list})
+		gen(units, f.Name())
 	}
 
-	return units, nil
+	if autoMode == MODE_AIO {
+		gen(units, f.Name())
+	}
 }
 
 type unit struct {

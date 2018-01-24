@@ -17,3 +17,22 @@
  */
 
 package main
+
+import (
+	. "github.com/popu125/benzipubor/epub-gen"
+)
+
+func gen(units []unit, dst string) {
+	g := NewGen()
+	g.NoGrey = noGrey
+	g.X = sizeX
+	g.SetLogger(*l)
+	g.SetTitle(dst)
+
+	for _, u := range units {
+		index := g.AppendImgList(u.ImageList)
+		g.AddTocNode(index+1, u.Name)
+	}
+
+	g.Do(dst + ".epub")
+}

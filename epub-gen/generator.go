@@ -23,8 +23,6 @@ import (
 	"archive/zip"
 	"strconv"
 	"os"
-	"bufio"
-	"sync"
 )
 
 type Gen struct {
@@ -44,8 +42,10 @@ func (g *Gen) AddTocNode(pic int, name string) {
 	g.tocNum += 1
 }
 
-func (g *Gen) SetImgList(imgList []string) {
-	g.imgList = imgList
+func (g *Gen) AppendImgList(slice []string) int {
+	count := len(g.imgList)
+	g.imgList = append(g.imgList, slice...)
+	return count
 }
 
 func (g *Gen) SetTitle(t string) {
@@ -58,13 +58,14 @@ func (g *Gen) SetLogger(l log.Logger) {
 }
 
 func (g Gen) Do(dst string) {
-	f, err := os.Open(dst)
+	f, err := os.Create(dst)
 	if err != nil {
-		g.l.Fatalln("Cannot open file to write:", dst)
+		g.l.Fatalln("Cannot open file to write:", dst, err)
 	}
+	defer f.Close()
 
-	buf := bufio.NewWriter(f)
-	w := zip.NewWriter(buf)
+	w := zip.NewWriter(f)
+	defer w.Close()
 
 	for k, v := range staticFiles {
 		sta, err := w.Create(k)
@@ -74,26 +75,19 @@ func (g Gen) Do(dst string) {
 		sta.Write([]byte(v))
 	}
 
-	var wg sync.WaitGroup
 	for i, fn := range g.imgList {
-		wg.Add(1)
-		go func(i int, fn string, group sync.WaitGroup) {
-			id := i + 1
-			// Pic
-			pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
-			g.doZip(fn, pic)
+		id := i + 1
+		// Pic
+		pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
+		g.doZip(fn, pic)
 
-			// Pages
-			page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
-			tpls["page"].Execute(page, id)
+		// Pages
+		page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
+		tpls["page"].Execute(page, pageInfo{ID: id, Title: g.bi.Title})
 
-			// Add ID to parse list
-			g.bi.Objects = append(g.bi.Objects, id)
-
-			group.Done()
-		}(i, fn, wg)
+		// Add ID to parse list
+		g.bi.Objects = append(g.bi.Objects, id)
 	}
-	wg.Wait()
 
 	g.bi.TocNodes = g.tocNodes
 
@@ -103,5 +97,6 @@ func (g Gen) Do(dst string) {
 	toc := getZipWriter(w, "toc.ncx")
 	tpls["toc"].Execute(toc, g.bi)
 
-	buf.Flush()
+	nav := getZipWriter(w, "toc.xhtml")
+	tpls["nav"].Execute(nav, g.bi)
 }

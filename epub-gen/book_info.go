@@ -25,3 +25,8 @@ type bookInfo struct {
 	Objects    []int
 	TocNodes   []toc
 }
+
+type pageInfo struct {
+	ID    int
+	Title string
+}

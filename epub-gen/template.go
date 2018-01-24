@@ -19,92 +19,69 @@
 package epub_gen
 
 import (
-	"html/template"
+	"text/template"
 	"math/rand"
 	"time"
 )
 
 var tplstrs = map[string]string{
 	"opf": `<?xml version = "1.0" encoding = "UTF-8"?>
-<package xmlns = "http://www.idpf.org/2007/opf" version = "3.0" xml:lang = "ja" unique-identifier = "unique-id" prefix = "rendition: http://www.idpf.org/vocab/rendition/#">
-
+<package xmlns = "http://www.idpf.org/2007/opf" version="3.0" xml:lang="ja" unique-identifier="unique-id" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
 <metadata xmlns:dc = "http://purl.org/dc/elements/1.1/">
-
-<dc:title id = "title">{{.Title}}</dc:title>
-<meta refines = "#title" property = "file-as"></meta>
-
-<dc:creator id="creator01">本子Pubor</dc:creator>
-
-<dc:subject></dc:subject>
-
-<dc:publisher id = "publisher">本子Pubor</dc:publisher>
-<meta refines = "#publisher" property = "file-as"></meta>
-
-<dc:language>ja</dc:language>
-
-<dc:identifier id = "unique-id">urn:uuid:{{.UUID}}</dc:identifier>
-
-<meta property = "dcterms:modified">{{.CreateTime}}</meta>
-
-<meta property = "rendition:layout">pre-paginated</meta>
-<meta property = "rendition:spread">landscape</meta>
-
-<meta property = "ebpaj:guide-version">1.1</meta>
-<meta name = "SpineColor" content = "#FFFFFF"></meta>
-<meta name = "cover" content = "cover"></meta>
-
+ <dc:title id = "title">{{.Title}}</dc:title>
+ <dc:creator>本子Pubor</dc:creator>
+ <dc:publisher>本子Pubor</dc:publisher>
+ <dc:language>ja</dc:language>
+ <dc:identifier id = "unique-id">urn:uuid:{{.UUID}}</dc:identifier>
+ <dc:date>{{.CreateTime}}</dc:date>
+ <meta property = "rendition:layout">pre-paginated</meta>
+ <meta property = "rendition:spread">landscape</meta>
+ <meta property = "ebpaj:guide-version">1.1</meta>
 </metadata>
 
 <manifest>
-
-<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
-<!-- style -->
-<item media-type = "text/css" id = "fixed-layout-jp" href = "style/fixed-layout-jp.css"></item>
-
+ <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+ <item id="toc" href="toc.xhtml" media-type="application/xhtml+xml" />
+ <item media-type = "text/css" id = "bzcss" href = "style/bz.css"></item>
 {{range .Objects}}
-<item id="i_{{.}}" href="image/i_{{.}}.jpg" media-type="image/jpeg"></item>
-<item id="p_{{.}}" href="text/p_{{.}}.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="i_{{.}}"></item>
+ <item id="i_{{.}}" href="image/i_{{.}}.jpg" media-type="image/jpeg"></item>
+ <item id="p_{{.}}" href="text/p_{{.}}.xhtml" media-type="application/xhtml+xml"></item>
 {{end}}
-
 </manifest>
 
 <spine toc="ncx">
-
 {{range .Objects}}
-<itemref idref="p_{{.}}"/>
+ <itemref idref="p_{{.}}"/>
 {{end}}
-
 </spine>
+<guide>
+ <reference href="toc.xhtml" type="toc" title="Table of Contents" />
+</guide>
+</package>`,
 
-</package >`,
+	"page": `<!DOCTYPE html>
+<html xmlns = "http://www.w3.org/1999/xhtml" xmlns:epub = "http://www.idpf.org/2007/ops" xml:lang = "ja">
+<head>
+<meta charset = "UTF-8" />
+<link rel = "stylesheet" type = "text/css" href = "../style/bz.css"/>
+<meta name = "viewport" content = "width=1000, height=1500"/>
+<title>{{.Title}}</title>
+</head>
+<body>
+<div class = "main">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ width="100%" height="100%" viewBox="0 0 1000 1500">
+<image width="100%" height="100%" preserveAspectRatio="none" xlink:href="../image/i_{{.ID}}.jpg" />
+</svg>
+</div>
+</body>
+</html>`,
 
-	"page": `<?xml version="1.0" encoding="UTF-8"?>
-	<!DOCTYPE html>
-	<html
-	xmlns = "http://www.w3.org/1999/xhtml"
-	xmlns:epub = "http://www.idpf.org/2007/ops"
-	xml:lang = "ja"
-	>
-	<head>
-	<meta charset = "UTF-8" />
-	<title>Yens</title>
-	<link rel = "stylesheet" type = "text/css" href = "../style/fixed-layout-jp.css"/>
-	<meta name = "viewport" content = "width=1000, height=1500"/>
-	</head>
-	<body>
-	<div class = "main">
-	<svg xmlns = "http://www.w3.org/2000/svg" version = "1.1"
-	xmlns:xlink = "http://www.w3.org/1999/xlink"
-	width = "100%" height = "100%" viewBox = "0 0 1000 1500">
-	<image width = "100%" height = "100%" preserveAspectRatio = "none" xlink:href = "../image/i_{{.}}.jpeg" />
-	</svg>
-	</div>
-	</body>
-	</html>`, // page.xhtml need: ID
 	"toc": `<?xml version="1.0"?>
 <ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
   <head>
-    <meta name="dtb:uid" content="unknown"/>
+    <meta name="dtb:uid" content="{{.UUID}}"/>
     <meta name="dtb:depth" content="1"/>
     <meta name="dtb:totalPageCount" content="0"/>
     <meta name="dtb:maxPageNumber" content="0"/>
@@ -122,8 +99,24 @@ var tplstrs = map[string]string{
     </navPoint>
    {{end}}
    </navMap>
-</ncx>
-`,
+</ncx>`,
+
+	"nav": `<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Table of Contents</title>
+  </head>
+  <body>
+    <nav epub:type="toc">
+      <h1>Table of Contents</h1>
+      <ol>
+      {{range .TocNodes}}<li><a href="text/p_{{.Pic}}.xhtml">{{.Name}}</a></li>{{end}}
+      </ol>
+      </nav>
+   </body>
+</html>`,
 }
 
 var staticFiles = map[string]string{
@@ -133,8 +126,9 @@ var staticFiles = map[string]string{
     <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
   </rootfiles>
 </container>`,
-	"style/fixed-layout-jp.css": `@charset "UTF-8"; html,body{margin:0;padding:0;font-size:0;}svg{margin:0;padding:0;}`,
-	"mimetype":                  "application/epub+zip",
+	"style/bz.css": `@charset "UTF-8"; html,body{margin:0;padding:0;}svg{margin:0;padding:0;}`,
+	"mimetype":     "application/epub+zip",
+	"cover.html":   "Welcome",
 }
 
 var tpls = map[string]*template.Template{}

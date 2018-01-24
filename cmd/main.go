@@ -41,4 +41,5 @@ func main() {
 		defer f.Close()
 	}
 
+	walkRootAndGen(inputDir)
 }
