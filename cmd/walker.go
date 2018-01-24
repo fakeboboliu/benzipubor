@@ -108,6 +108,8 @@ func walkRootAndGen(path string) {
 		}
 	}
 
+	fd, _ := f.Stat()
+
 	if !haveDir {
 		list, err := walkDir(path)
 		if err != nil {
@@ -115,11 +117,11 @@ func walkRootAndGen(path string) {
 			lo.Fatalln(err)
 		}
 		units = append(units, unit{Name: f.Name(), ImageList: list})
-		gen(units, f.Name())
+		gen(units, fd.Name())
 	}
 
 	if autoMode == MODE_AIO {
-		gen(units, f.Name())
+		gen(units, fd.Name())
 	}
 }
 
