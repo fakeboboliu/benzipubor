@@ -60,8 +60,8 @@ func (g *Gen) doZip(path string, w io.Writer) error {
 	dx := bound.Dx()
 	dy := bound.Dy()
 	dst := src
-	if dx > g.X {
-		dst = resize.Resize(uint(g.X), uint(dy*(g.X/dx)), src, resize.Lanczos3)
+	if dx > g.x {
+		dst = resize.Resize(uint(g.x), uint(dy*(g.x/dx)), src, resize.Lanczos3)
 	}
 
 	if g.Grey {

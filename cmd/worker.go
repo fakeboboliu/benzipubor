@@ -25,7 +25,7 @@ import (
 func gen(units []unit, dst string) {
 	g := NewGen()
 	g.Grey = grey
-	g.X = sizeX
+	g.SetX(sizeX)
 	g.SetLogger(*l)
 	g.SetTitle(dst)
 	g.SetQuality(quality)

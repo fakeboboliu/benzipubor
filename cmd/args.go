@@ -45,7 +45,7 @@ func init() {
 	flag.UintVar(&autoMode, "mode", 0, "模式选择: 0: 'aio' 制作为一个电子书文件, 1: 'single' 每个子目录一个独立文件")
 	flag.StringVar(&inputDir, "in", ".", "输入目录")
 	flag.StringVar(&logFile, "log", "stdout", "日志输出")
-	flag.IntVar(&sizeX, "sizex", 780, "图片压缩尺寸（横向）")
+	flag.IntVar(&sizeX, "sizex", 780, "图片压缩尺寸（横向，500-1500）")
 	flag.BoolVar(&grey, "grey", true, "将图片处理为灰色（有助压缩到更小）")
 	flag.IntVar(&quality, "quality", 50, "图片输出质量（1-100，越高越质量越好，体积越大）")
 

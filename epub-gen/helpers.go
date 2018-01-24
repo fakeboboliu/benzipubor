@@ -33,13 +33,23 @@ func NewGen() *Gen {
 		// Table of Contents
 		tocNum: 1, imgList: make([]string, 0), tocNodes: make([]toc, 0),
 		// Image settings
-		X: 720, Grey: true, quality: 80,
+		x: 720, Grey: true, quality: 80,
 	}
 }
 
 func getMime(fn string) string {
 	ext := path.Ext(fn)
 	return mime.TypeByExtension(ext)
+}
+
+func inRange(in, min, max int) int {
+	if in <= min {
+		return min
+	} else if in >= max {
+		return max
+	} else {
+		return max
+	}
 }
 
 func getZipWriter(w *zip.Writer, name string) io.Writer {

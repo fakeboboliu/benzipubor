@@ -33,19 +33,17 @@ type Gen struct {
 	bi bookInfo
 	l  *log.Logger
 
-	X       int
+	x       int
 	Grey    bool
 	quality int
 }
 
+func (g *Gen) SetX(x int) {
+	g.x = inRange(x, 500, 1500)
+}
+
 func (g *Gen) SetQuality(quality int) {
-	if quality <= 1 {
-		g.quality = 1
-	} else if quality >= 100 {
-		g.quality = 100
-	} else {
-		g.quality = quality
-	}
+	g.quality = inRange(quality, 1, 100)
 }
 
 func (g *Gen) AddTocNode(pic int, name string) {
