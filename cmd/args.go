@@ -47,7 +47,7 @@ func init() {
 	flag.StringVar(&logFile, "log", "stdout", "日志输出")
 	flag.IntVar(&sizeX, "sizex", 780, "图片压缩尺寸（横向）")
 	flag.BoolVar(&grey, "grey", true, "将图片处理为灰色（有助压缩到更小）")
-	flag.IntVar(&quality, "quality", 80, "图片输出质量（1-100，越高越质量越好，体积越大）")
+	flag.IntVar(&quality, "quality", 50, "图片输出质量（1-100，越高越质量越好，体积越大）")
 
 	help := flag.Bool("h", false, "打印帮助信息")
 	flag.Parse()
