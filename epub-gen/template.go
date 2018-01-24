@@ -74,7 +74,7 @@ var tplstrs = map[string]string{
 </body>
 </html>`,
 
-	"toc": `<?xml version="1.0"?>
+	"toc": `<?xml version="1.0" encoding="UTF-8"?>
 <ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
   <head>
     <meta name="dtb:uid" content="{{.UUID}}"/>
@@ -97,7 +97,8 @@ var tplstrs = map[string]string{
    </navMap>
 </ncx>`,
 
-	"nav": `<!DOCTYPE html>
+	"nav": `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
   <head>
