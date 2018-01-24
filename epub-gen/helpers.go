@@ -48,7 +48,7 @@ func inRange(in, min, max int) int {
 	} else if in >= max {
 		return max
 	} else {
-		return max
+		return in
 	}
 }
 
