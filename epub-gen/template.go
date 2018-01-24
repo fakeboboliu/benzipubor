@@ -68,12 +68,8 @@ var tplstrs = map[string]string{
 <title>{{.Title}}</title>
 </head>
 <body>
-<div class = "main">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
- xmlns:xlink="http://www.w3.org/1999/xlink"
- width="100%" height="100%" viewBox="0 0 1000 1500">
-<image width="100%" height="100%" preserveAspectRatio="none" xlink:href="../image/i_{{.ID}}.jpg" />
-</svg>
+<div class="main">
+<img width="100%" height="100%" src="../image/i_{{.ID}}.jpg" />
 </div>
 </body>
 </html>`,
@@ -126,7 +122,7 @@ var staticFiles = map[string]string{
     <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
   </rootfiles>
 </container>`,
-	"style/bz.css": `@charset "UTF-8"; html,body{margin:0;padding:0;}svg{margin:0;padding:0;}`,
+	"style/bz.css": `@charset "UTF-8"; html,body{margin:0;padding:0;}svg{margin:0;padding:0;}.main{width:1000px;height:1500px;}`,
 	"mimetype":     "application/epub+zip",
 	"cover.html":   "Welcome",
 }
