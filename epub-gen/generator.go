@@ -85,6 +85,7 @@ func (g Gen) Do(dst string) {
 	}
 
 	for i, fn := range g.imgList {
+		g.l.Println("Processing:", fn)
 		id := i + 1
 		// Pic
 		pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")

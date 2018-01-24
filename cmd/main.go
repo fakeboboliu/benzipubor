@@ -42,4 +42,5 @@ func main() {
 	}
 
 	walkRootAndGen(inputDir)
+	l.Println("Done.")
 }
