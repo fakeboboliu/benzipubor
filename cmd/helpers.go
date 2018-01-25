@@ -32,3 +32,7 @@ func getMime(fn string) string {
 func pathLink(a, b string) string {
 	return a + string(os.PathSeparator) + b
 }
+
+func isSet(a string) bool {
+	return a != ""
+}

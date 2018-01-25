@@ -27,7 +27,11 @@ func gen(units []unit, dst string) {
 	g.Grey = grey
 	g.SetX(sizeX)
 	g.SetLogger(*l)
-	g.SetTitle(dst)
+	if isSet(title) {
+		g.SetTitle(title)
+	} else {
+		g.SetTitle(dst)
+	}
 	g.SetQuality(quality)
 
 	for _, u := range units {

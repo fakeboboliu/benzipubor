@@ -36,6 +36,7 @@ var (
 	logFile  string
 	sizeX    int
 	grey     bool
+	title    string
 	quality  int
 
 	l *log.Logger
@@ -48,6 +49,7 @@ func init() {
 	flag.IntVar(&sizeX, "sizex", 780, "图片压缩尺寸（横向，500-1500）")
 	flag.BoolVar(&grey, "grey", true, "将图片处理为灰色（有助压缩到更小）")
 	flag.IntVar(&quality, "quality", 50, "图片输出质量（1-100，越高越质量越好，体积越大）")
+	flag.StringVar(&title, "title", "", "手动指定电子书标题")
 
 	help := flag.Bool("h", false, "打印帮助信息")
 	flag.Parse()
