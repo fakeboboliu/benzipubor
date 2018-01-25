@@ -19,10 +19,10 @@
 package epub_gen
 
 import (
-	"log"
 	"archive/zip"
-	"strconv"
+	"log"
 	"os"
+	"strconv"
 )
 
 type Gen struct {

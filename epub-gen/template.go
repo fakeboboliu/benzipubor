@@ -19,8 +19,8 @@
 package epub_gen
 
 import (
-	"text/template"
 	"math/rand"
+	"text/template"
 	"time"
 )
 

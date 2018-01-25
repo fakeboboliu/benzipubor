@@ -19,16 +19,16 @@
 package epub_gen
 
 import (
-	"image"
+	"errors"
 	"github.com/nfnt/resize"
+	"image"
 	"image/color"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"os"
 	"strings"
-	"image/jpeg"
-	"image/png"
-	"image/gif"
-	"errors"
 )
 
 func (g *Gen) doZip(path string, w io.Writer) error {

@@ -97,7 +97,7 @@ func walkRootAndGen(path string) {
 					lo.Println("Cannot access:", fd.Name())
 					lo.Fatalln(err)
 				}
-				units = []unit{{Name: fd.Name(), ImageList: list},}
+				units = []unit{{Name: fd.Name(), ImageList: list}}
 				gen(units, fd.Name())
 			}
 		} else {

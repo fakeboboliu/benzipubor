@@ -19,11 +19,11 @@
 package epub_gen
 
 import (
-	"time"
-	"mime"
-	"path"
 	"archive/zip"
 	"io"
+	"mime"
+	"path"
+	"time"
 )
 
 func NewGen() *Gen {

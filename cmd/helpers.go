@@ -20,8 +20,8 @@ package main
 
 import (
 	"mime"
-	"path"
 	"os"
+	"path"
 )
 
 func getMime(fn string) string {
