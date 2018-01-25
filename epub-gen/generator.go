@@ -23,6 +23,8 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
+	"bytes"
 )
 
 type Gen struct {
@@ -84,20 +86,28 @@ func (g Gen) Do(dst string) {
 		sta.Write([]byte(v))
 	}
 
+	var wg sync.WaitGroup
 	for i, fn := range g.imgList {
-		g.l.Println("Processing:", fn)
+		wg.Add(1)
 		id := i + 1
-		// Pic
-		pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
-		g.doZip(fn, pic)
-
-		// Pages
-		page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
-		tpls["page"].Execute(page, pageInfo{ID: id, Title: g.bi.Title})
-
-		// Add ID to parse list
 		g.bi.Objects = append(g.bi.Objects, id)
+		go func(id int, fn string) {
+			// Pic
+			b := new(bytes.Buffer)
+			g.doZip(fn, b)
+			pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
+			b.WriteTo(pic)
+
+			// Page
+			page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
+			tpls["page"].Execute(page, pageInfo{ID: id, Title: g.bi.Title})
+
+			wg.Done()
+
+			g.l.Println("Processed:", fn)
+		}(id, fn)
 	}
+	wg.Wait()
 
 	g.bi.TocNodes = g.tocNodes
 

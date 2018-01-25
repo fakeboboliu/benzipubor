@@ -24,6 +24,7 @@ import (
 	"mime"
 	"path"
 	"time"
+	"sync"
 )
 
 func NewGen() *Gen {
@@ -52,7 +53,11 @@ func inRange(in, min, max int) int {
 	}
 }
 
+var zipLock sync.Mutex
+
 func getZipWriter(w *zip.Writer, name string) io.Writer {
+	zipLock.Lock()
+	defer zipLock.Unlock()
 	a, err := w.Create(name)
 	if err != nil {
 		panic(err)
