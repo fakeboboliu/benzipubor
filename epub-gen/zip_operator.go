@@ -33,7 +33,9 @@ func newZipOp(w *zip.Writer) *zipOp {
 }
 
 func (z *zipOp) WriteZip(name string, data []byte) {
-	z.c <- task{Name: name, Data: data}
+	d := make([]byte, len(data))
+	copy(d, data)
+	z.c <- task{Name: name, Data: d}
 }
 
 func (z *zipOp) zipWriter() {
