@@ -18,40 +18,44 @@
 
 package epub_gen
 
-import (
-	"mime"
-	"path"
-	"time"
-)
+import "archive/zip"
 
-func NewGen() *Gen {
-	return &Gen{
-		// Book Info
-		bi: bookInfo{UUID: randUUID(), CreateTime: time.Now().Format(time.RFC3339)},
-		// Table of Contents
-		tocNum: 1, imgList: make([]string, 0), tocNodes: make([]toc, 0),
-		// Image settings
-		x: 720, Grey: true, quality: 80,
+type zipOp struct {
+	w    *zip.Writer
+	c    chan task
+	done chan bool
+}
+
+func newZipOp(w *zip.Writer) *zipOp {
+	op := &zipOp{w: w, c: make(chan task, 64), done: make(chan bool)}
+	go op.zipWriter()
+	return op
+}
+
+func (z *zipOp) WriteZip(name string, data []byte) {
+	z.c <- task{Name: name, Data: data}
+}
+
+func (z *zipOp) zipWriter() {
+	for t := range z.c {
+		a, err := z.w.Create(t.Name)
+		if err != nil {
+			panic(err)
+		}
+		a.Write(t.Data)
 	}
+	z.done <- true
 }
 
-func getMime(fn string) string {
-	ext := path.Ext(fn)
-	return mime.TypeByExtension(ext)
+func (z *zipOp) Done() {
+	close(z.c)
 }
 
-func inRange(in, min, max int) int {
-	if in <= min {
-		return min
-	} else if in >= max {
-		return max
-	} else {
-		return in
-	}
+func (z *zipOp) Wait() {
+	<-z.done
 }
 
-type toc struct {
-	ID   int
-	Pic  int
+type task struct {
 	Name string
+	Data []byte
 }

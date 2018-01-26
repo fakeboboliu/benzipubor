@@ -77,6 +77,7 @@ func (g Gen) Do(dst string) {
 
 	w := zip.NewWriter(f)
 	defer w.Close()
+	op := newZipOp(w)
 
 	for k, v := range staticFiles {
 		sta, err := w.Create(k)
@@ -93,14 +94,14 @@ func (g Gen) Do(dst string) {
 		g.bi.Objects = append(g.bi.Objects, id)
 		go func(id int, fn string) {
 			// Pic
-			b := new(bytes.Buffer)
-			g.doZip(fn, b)
-			pic := getZipWriter(w, "image/i_"+strconv.Itoa(id)+".jpg")
-			b.WriteTo(pic)
+			buf := new(bytes.Buffer)
+			g.doZip(fn, buf)
+			op.WriteZip("image/i_"+strconv.Itoa(id)+".jpg", buf.Bytes())
+			buf.Reset()
 
 			// Page
-			page := getZipWriter(w, "text/p_"+strconv.Itoa(id)+".xhtml")
-			tpls["page"].Execute(page, pageInfo{ID: id, Title: g.bi.Title})
+			tpls["page"].Execute(buf, pageInfo{ID: id, Title: g.bi.Title})
+			op.WriteZip("text/p_"+strconv.Itoa(id)+".xhtml", buf.Bytes())
 
 			wg.Done()
 
@@ -110,13 +111,19 @@ func (g Gen) Do(dst string) {
 	wg.Wait()
 
 	g.bi.TocNodes = g.tocNodes
+	buf := new(bytes.Buffer)
 
-	opf := getZipWriter(w, "content.opf")
-	tpls["opf"].Execute(opf, g.bi)
+	tpls["opf"].Execute(buf, g.bi)
+	op.WriteZip("content.opf", buf.Bytes())
+	buf.Reset()
 
-	toc := getZipWriter(w, "toc.ncx")
-	tpls["toc"].Execute(toc, g.bi)
+	tpls["toc"].Execute(buf, g.bi)
+	op.WriteZip("toc.ncx", buf.Bytes())
+	buf.Reset()
 
-	nav := getZipWriter(w, "toc.xhtml")
-	tpls["nav"].Execute(nav, g.bi)
+	tpls["nav"].Execute(buf, g.bi)
+	op.WriteZip("toc.xhtml", buf.Bytes())
+
+	op.Done()
+	op.Wait()
 }

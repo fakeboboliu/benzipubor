@@ -34,7 +34,7 @@
 
 ![bz1](https://user-images.githubusercontent.com/7552030/35371865-a7cd50aa-01d1-11e8-831d-a813c8716225.gif)
 
-只需从[Release页面](https://github.com/popu125/benzipubor/releases)下载编译好的二进制文件（请注意位数，尤其是Windows，错误的版本可能会导致图片压缩出现错误）即可快速开始，演示中是最基本的使用方法，即直接启动将当前目录下图片文件制作为epub，使用默认参数。
+只需从[Release页面](https://github.com/popu125/benzipubor/releases)下载编译好的二进制文件即可快速开始，演示中是最基本的使用方法，即直接启动将当前目录下图片文件制作为epub，使用默认参数。
 
 除此之外，如果你在执行时添加`-h`参数，将看到一个帮助信息。
 
