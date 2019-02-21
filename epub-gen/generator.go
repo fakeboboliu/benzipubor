@@ -24,7 +24,6 @@ import (
 	"os"
 	"strconv"
 	"sync"
-	"bytes"
 )
 
 type Gen struct {
@@ -94,14 +93,14 @@ func (g Gen) Do(dst string) {
 		g.bi.Objects = append(g.bi.Objects, id)
 		go func(id int, fn string) {
 			// Pic
-			buf := new(bytes.Buffer)
-			g.doZip(fn, buf)
-			op.WriteZip("image/i_"+strconv.Itoa(id)+".jpg", buf.Bytes())
-			buf.Reset()
+			fw := op.Writer("image/i_" + strconv.Itoa(id) + ".jpg")
+			g.doZip(fn, fw)
+			fw.Flush()
 
 			// Page
-			tpls["page"].Execute(buf, pageInfo{ID: id, Title: g.bi.Title})
-			op.WriteZip("text/p_"+strconv.Itoa(id)+".xhtml", buf.Bytes())
+			fw = op.Writer("text/p_" + strconv.Itoa(id) + ".xhtml")
+			tpls["page"].Execute(fw, pageInfo{ID: id, Title: g.bi.Title})
+			fw.Flush()
 
 			wg.Done()
 
@@ -111,18 +110,18 @@ func (g Gen) Do(dst string) {
 	wg.Wait()
 
 	g.bi.TocNodes = g.tocNodes
-	buf := new(bytes.Buffer)
 
-	tpls["opf"].Execute(buf, g.bi)
-	op.WriteZip("content.opf", buf.Bytes())
-	buf.Reset()
+	fw := op.Writer("content.opf")
+	tpls["opf"].Execute(fw, g.bi)
+	fw.Flush()
 
-	tpls["toc"].Execute(buf, g.bi)
-	op.WriteZip("toc.ncx", buf.Bytes())
-	buf.Reset()
+	fw = op.Writer("toc.ncx")
+	tpls["toc"].Execute(fw, g.bi)
+	fw.Flush()
 
-	tpls["nav"].Execute(buf, g.bi)
-	op.WriteZip("toc.xhtml", buf.Bytes())
+	fw = op.Writer("toc.xhtml")
+	tpls["nav"].Execute(fw, g.bi)
+	fw.Flush()
 
 	op.Done()
 	op.Wait()

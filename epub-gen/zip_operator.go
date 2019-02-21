@@ -18,12 +18,29 @@
 
 package epub_gen
 
-import "archive/zip"
+import (
+	"archive/zip"
+	"bytes"
+)
 
 type zipOp struct {
 	w    *zip.Writer
 	c    chan task
 	done chan bool
+}
+
+type zipW struct {
+	fn  string
+	z   *zipOp
+	buf *bytes.Buffer
+}
+
+func (zw *zipW) Write(p []byte) (n int, err error) {
+	return zw.buf.Write(p)
+}
+
+func (zw *zipW) Flush() {
+	zw.z.WriteFile(zw.fn, zw.buf.Bytes())
 }
 
 func newZipOp(w *zip.Writer) *zipOp {
@@ -32,7 +49,7 @@ func newZipOp(w *zip.Writer) *zipOp {
 	return op
 }
 
-func (z *zipOp) WriteZip(name string, data []byte) {
+func (z *zipOp) WriteFile(name string, data []byte) {
 	d := make([]byte, len(data))
 	copy(d, data)
 	z.c <- task{Name: name, Data: d}
@@ -47,6 +64,10 @@ func (z *zipOp) zipWriter() {
 		a.Write(t.Data)
 	}
 	z.done <- true
+}
+
+func (z *zipOp) Writer(name string) *zipW {
+	return &zipW{fn: name, z: z, buf: new(bytes.Buffer)}
 }
 
 func (z *zipOp) Done() {
