@@ -92,33 +92,33 @@ func (g Gen) Do(dst string) {
 		sta.Write([]byte(v))
 	}
 
+	type imgProcessWorking struct {
+		id int
+		fn string
+	}
 	var wg sync.WaitGroup
-	workInProcess := 0
-	for i, fn := range g.imgList {
-		wg.Add(1)
-		id := i + 1
-		workInProcess += 1
-		g.bi.Objects = append(g.bi.Objects, id)
-		go func(id int, fn string) {
+	workChan := make(chan imgProcessWorking, g.th)
+	go func() {
+		for img := range workChan {
 			// Pic
-			fw := op.Writer("image/i_" + strconv.Itoa(id) + ".jpg")
-			g.doZip(fn, fw)
+			fw := op.Writer("image/i_" + strconv.Itoa(img.id) + ".jpg")
+			g.doZip(img.fn, fw)
 			fw.Flush()
 
 			// Page
-			fw = op.Writer("text/p_" + strconv.Itoa(id) + ".xhtml")
-			tpls["page"].Execute(fw, pageInfo{ID: id, Title: g.bi.Title})
+			fw = op.Writer("text/p_" + strconv.Itoa(img.id) + ".xhtml")
+			tpls["page"].Execute(fw, pageInfo{ID: img.id, Title: g.bi.Title})
 			fw.Flush()
 
 			wg.Done()
-
-			g.l.Println("Processed:", fn)
-		}(id, fn)
-
-		// Prevent overflow
-		if workInProcess >= g.th {
-			wg.Wait()
+			g.l.Println("Processed:", img.fn)
 		}
+	}()
+	for i, fn := range g.imgList {
+		wg.Add(1)
+		id := i + 1
+		g.bi.Objects = append(g.bi.Objects, id)
+		workChan <- imgProcessWorking{id: id, fn: fn}
 	}
 	wg.Wait()
 

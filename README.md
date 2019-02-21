@@ -65,7 +65,7 @@ Usage of C:\Users\boboliu\Documents\temp\benziporer-test\benzipubor-win32.exe:
   -sizex int
         图片压缩尺寸（横向，500-1500） (default 780)
   -thread int
-        同时进行的图片转换工作，过大将导致内存溢出 (default 16)
+        同时进行的图片转换工作，过大将导致内存溢出 (default 8)
   -title string
         手动指定电子书标题
 ```

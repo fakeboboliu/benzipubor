@@ -51,7 +51,7 @@ func init() {
 	flag.BoolVar(&noGrey, "nogrey", false, "不将图片处理为灰色（结果文件将更大）")
 	flag.IntVar(&quality, "quality", 50, "图片输出质量（1-100，越高越质量越好，体积越大）")
 	flag.StringVar(&title, "title", "", "手动指定电子书标题")
-	flag.IntVar(&thread, "thread", 16, "同时进行的图片转换工作，过大将导致内存溢出")
+	flag.IntVar(&thread, "thread", 8, "同时进行的图片转换工作，过大将导致内存溢出")
 
 	help := flag.Bool("h", false, "打印帮助信息")
 	flag.Parse()
