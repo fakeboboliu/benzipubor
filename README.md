@@ -50,9 +50,7 @@
 
 ```
 λ benzipubor -h
-Usage of benzipubor:
-  -grey
-        将图片处理为灰色（有助压缩到更小） (default true)
+Usage of C:\Users\boboliu\Documents\temp\benziporer-test\benzipubor-win32.exe:
   -h    打印帮助信息
   -in string
         输入目录 (default ".")
@@ -60,10 +58,16 @@ Usage of benzipubor:
         日志输出 (default "stdout")
   -mode uint
         模式选择: 0: 'aio' 制作为一个电子书文件, 1: 'single' 每个子目录一个独立文件
+  -nogrey
+        不将图片处理为灰色（结果文件将更大）
   -quality int
         图片输出质量（1-100，越高越质量越好，体积越大） (default 50)
   -sizex int
         图片压缩尺寸（横向，500-1500） (default 780)
+  -thread int
+        同时进行的图片转换工作，过大将导致内存溢出 (default 16)
+  -title string
+        手动指定电子书标题
 ```
 
 ## LICENSE

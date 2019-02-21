@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	MODE_AIO    = iota
+	MODE_AIO = iota
 	MODE_SINGLE
 )
 
@@ -35,9 +35,10 @@ var (
 	inputDir string
 	logFile  string
 	sizeX    int
-	grey     bool
+	noGrey   bool
 	title    string
 	quality  int
+	thread   int
 
 	l *log.Logger
 )
@@ -47,9 +48,10 @@ func init() {
 	flag.StringVar(&inputDir, "in", ".", "输入目录")
 	flag.StringVar(&logFile, "log", "stdout", "日志输出")
 	flag.IntVar(&sizeX, "sizex", 780, "图片压缩尺寸（横向，500-1500）")
-	flag.BoolVar(&grey, "grey", true, "将图片处理为灰色（有助压缩到更小）")
+	flag.BoolVar(&noGrey, "nogrey", false, "不将图片处理为灰色（结果文件将更大）")
 	flag.IntVar(&quality, "quality", 50, "图片输出质量（1-100，越高越质量越好，体积越大）")
 	flag.StringVar(&title, "title", "", "手动指定电子书标题")
+	flag.IntVar(&thread, "thread", 16, "同时进行的图片转换工作，过大将导致内存溢出")
 
 	help := flag.Bool("h", false, "打印帮助信息")
 	flag.Parse()

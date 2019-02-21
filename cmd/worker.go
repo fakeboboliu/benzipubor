@@ -24,8 +24,9 @@ import (
 
 func gen(units []unit, dst string) {
 	g := NewGen()
-	g.Grey = grey
+	g.Grey = !noGrey
 	g.SetX(sizeX)
+	g.SetTh(thread)
 	g.SetLogger(*l)
 	if isSet(title) {
 		g.SetTitle(title)

@@ -37,6 +37,8 @@ type Gen struct {
 	x       int
 	Grey    bool
 	quality int
+
+	th int
 }
 
 func (g *Gen) SetX(x int) {
@@ -45,6 +47,10 @@ func (g *Gen) SetX(x int) {
 
 func (g *Gen) SetQuality(quality int) {
 	g.quality = inRange(quality, 1, 100)
+}
+
+func (g *Gen) SetTh(th int) {
+	g.th = inRange(th, 1, 64)
 }
 
 func (g *Gen) AddTocNode(pic int, name string) {
@@ -87,9 +93,11 @@ func (g Gen) Do(dst string) {
 	}
 
 	var wg sync.WaitGroup
+	workInProcess := 0
 	for i, fn := range g.imgList {
 		wg.Add(1)
 		id := i + 1
+		workInProcess += 1
 		g.bi.Objects = append(g.bi.Objects, id)
 		go func(id int, fn string) {
 			// Pic
@@ -106,6 +114,11 @@ func (g Gen) Do(dst string) {
 
 			g.l.Println("Processed:", fn)
 		}(id, fn)
+
+		// Prevent overflow
+		if workInProcess >= g.th {
+			wg.Wait()
+		}
 	}
 	wg.Wait()
 
