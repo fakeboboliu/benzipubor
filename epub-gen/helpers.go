@@ -19,8 +19,6 @@
 package epub_gen
 
 import (
-	"mime"
-	"path"
 	"time"
 )
 
@@ -34,12 +32,6 @@ func NewGen() *Gen {
 		x: 720, Grey: true, quality: 80,
 	}
 }
-
-func getMime(fn string) string {
-	ext := path.Ext(fn)
-	return mime.TypeByExtension(ext)
-}
-
 func inRange(in, min, max int) int {
 	if in <= min {
 		return min

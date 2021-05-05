@@ -19,16 +19,13 @@
 package epub_gen
 
 import (
-	"errors"
-	"github.com/nfnt/resize"
 	"image"
 	"image/color"
-	"image/gif"
 	"image/jpeg"
-	"image/png"
 	"io"
 	"os"
-	"strings"
+
+	"github.com/nfnt/resize"
 )
 
 func (g *Gen) doZip(path string, w io.Writer) error {
@@ -40,16 +37,7 @@ func (g *Gen) doZip(path string, w io.Writer) error {
 	}
 
 	var src image.Image
-	switch strings.ToLower(getMime(path)) {
-	case "image/jpeg":
-		src, err = jpeg.Decode(f)
-	case "image/png":
-		src, err = png.Decode(f)
-	case "image/gif":
-		src, err = gif.Decode(f)
-	default:
-		err = errors.New("extension not known")
-	}
+	src, _, err = image.Decode(f)
 	if err != nil {
 		g.l.Println("Image file can't load:", path)
 		g.l.Println("[DEBUG]", err)
