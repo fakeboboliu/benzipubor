@@ -19,7 +19,7 @@
 package main
 
 import (
-	. "github.com/popu125/benzipubor/epub-gen"
+	. "github.com/fakeboboliu/benzipubor/epub-gen"
 )
 
 func gen(units []unit, dst string) {
